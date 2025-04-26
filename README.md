@@ -5,6 +5,21 @@
 
 
 # Camino-Time
+## Description
+This project is an experiment/first foray into the world of rust and leptos. It builds a simple site that shows an openstreetmap map that renders gpx files. These gpx files are stored on the SERVER and can be appended through a secured endpoint for custom uploading. (not yet built)
+
+The intention is to use this app as a way for friends & families to track our camino progress. By uploading a gpx track of the hike daily, they get to see the progress we've made over the course of time.
+
+## Features (todo)
+- [ ] Map the renders all GPX files
+  - [ ] color graded per day (more gray as they get older)
+  - [ ] nobs at the end to indicate endpoints. (Gives indiana jones vibes)
+  - [ ] Sample track (the estimated way)
+  - [ ] Resolution filter on gpx endpoint, to reduce the amount of points sent.
+- [ ] Upload endpoint to be able to push gpx files from mobile device into `./uploads`
+  - [ ] Secure the endpoint to make sure only owner can upload (how to do)
+    - [ ] Has to work on android and be easy to use
+- [ ] Secure site with basic password to allow only friends to follow. (for basic privacy)
 
 ## Running the project
 
