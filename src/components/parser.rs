@@ -1,14 +1,13 @@
 use gpx::Gpx;
 use std::io::BufReader;
 // use std::fs::File;
-use leptos::prelude::*;
 use crate::types::{Point, Segment, Track};
-use gpx::read;
 use futures::future::join_all;
+use gpx::read;
 use leptos::logging::log;
+use leptos::prelude::*;
 
-
-fn sample_track()-> Track{
+fn sample_track() -> Track {
     let p0 = Point { lat: 0.0, lon: 0.0 };
     let p1 = Point { lat: 5.0, lon: 5.0 };
     let points: Vec<Point> = vec![p0, p1];
@@ -21,20 +20,18 @@ fn sample_track()-> Track{
     track
 }
 
-pub async fn read_gpx_files(filepaths: Vec<String>)->Result<Vec<Track>, ServerFnError> {
-
+#[cfg(feature = "ssr")]
+pub async fn read_gpx_files(filepaths: Vec<String>) -> Result<Vec<Track>, ServerFnError> {
     // read a bunch of files using some threads
-    let futures = filepaths.into_iter().map(
-        |path| {
-            async move {
-                read_gpx_file(path).await.unwrap()
-            }
-        }
-    );
+    let futures = filepaths
+        .into_iter()
+        .map(|path| async move { read_gpx_file(path).await.unwrap() });
     let res = join_all(futures).await;
 
     Ok(res)
 }
+
+#[cfg(feature = "ssr")]
 pub async fn read_gpx_file(filepath: String) -> Result<Track, ServerFnError> {
     // dbg!(&filepath);
     log!("Parsing: {}", &filepath);
@@ -43,37 +40,36 @@ pub async fn read_gpx_file(filepath: String) -> Result<Track, ServerFnError> {
     // This XML file actually exists — try it for yourself!
     // let file = File::open(&filepath).unwrap();
     let file = fs::read(&filepath).await?;
-    let reader = BufReader::new(file);
-    let gpx: Gpx = read(reader).unwrap();
+    let cursor = std::io::Cursor::new(&file);
+    // let reader = BufReader::new(file);
+    let gpx: Gpx = read(cursor).unwrap();
     let mut track_segments: Vec<Segment> = vec![];
 
     for file_track in &gpx.tracks {
+        let mut points: Vec<Point> = vec![];
 
-        let mut points : Vec<Point> = vec![];
-
-        for seg in &file_track.segments{
+        for seg in &file_track.segments {
             let mut skipper: i32 = 0;
-            for waypoint in &seg.points{
-                skipper +=1;
-                 if skipper % 50 != 0 {
+            for waypoint in &seg.points {
+                skipper += 1;
+                if skipper % 50 != 0 {
                     continue;
-                 }
-                let p = Point{
+                }
+                let p = Point {
                     lat: waypoint.point().y(),
-                    lon: waypoint.point().x()
+                    lon: waypoint.point().x(),
                 };
                 points.push(p);
-
             }
-            let new_seg = Segment{
-                points:points.clone()
+            let new_seg = Segment {
+                points: points.clone(),
             };
             track_segments.push(new_seg);
         }
     }
-    let track = Track{
+    let track = Track {
         segments: track_segments.clone(),
-        name: filepath
+        name: filepath,
     };
 
     Ok(track)
