@@ -8,7 +8,8 @@ use crate::components::parser;
 #[component]
 pub fn GpxMap()-> impl IntoView{
 
-    let tracks_resource = OnceResource::new(get_gpx_tracks());
+    let res = 30;
+    let tracks_resource = OnceResource::new(get_gpx_tracks(res));
 
     // let tracks : Vec<Track> = vec![];
     view!{
@@ -43,7 +44,7 @@ fn GpxMapPlaceholder() -> impl IntoView{
 fn GpxMapTrackViewer(tracks: Vec<Track>) -> impl IntoView{
     let start_pos = Position::new(42.211,-8.443);
     view! {
-        <MapContainer style="height: 801px" center=start_pos zoom=10.0 set_view=true>
+        <MapContainer style="height: 801px" center=start_pos zoom=9.0 set_view=true>
             <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"/>
     { tracks.into_iter()
                     .map(|track| view!{<GpxTrack track=track />})
@@ -55,14 +56,25 @@ fn GpxMapTrackViewer(tracks: Vec<Track>) -> impl IntoView{
 }
 
 
-
+pub fn has_value(value:Option<Point>) -> bool{
+    match value{
+        Some(_) => true,
+        None => false
+    }
+}
 
 #[component]
 pub fn GpxTrack(track: Track) -> impl IntoView {
-    // log!("Rendering -track");
-
+    let last_pos = track.get_last_point();
     view! {
-        <GpxSegments segments=track.segments.clone() />
+        <GpxTrackEnd endpoint=last_pos.unwrap() />
+         <GpxSegments segments=track.segments.clone() />
+    }
+}
+#[component]
+pub fn GpxTrackEnd(endpoint: Point)-> impl IntoView{
+    view!{
+        <Circle center=Position::from(endpoint) radius=400.0 > </Circle>
     }
 }
 
@@ -75,8 +87,6 @@ pub fn GpxSegments(segments: Vec<Segment>) -> impl IntoView {
                     <GpxSegment segment=seg />
                 }).collect_view()
             }
-
-
     }
 }
 
@@ -115,11 +125,12 @@ pub fn read_gpx_from_dir(path: &String) -> Result<Vec<String>, ServerFnError> {
 
 
 #[server]
-pub async fn get_gpx_tracks()-> Result<Vec<Track>, ServerFnError>{
+pub async fn get_gpx_tracks(resolution:i32)-> Result<Vec<Track>, ServerFnError>{
     let search_path: String = "./uploads".to_string();
     let paths = read_gpx_from_dir(&search_path)?;
 
-    let tracks = parser::read_gpx_files(paths).await.unwrap();
+    // let resolution :i32 = 25;
+    let tracks = parser::read_gpx_files(paths, resolution).await.unwrap();
 
     log!("Collected {} tracks", &tracks.len());
 

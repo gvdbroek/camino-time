@@ -19,18 +19,18 @@ fn sample_track() -> Track {
 }
 
 #[cfg(feature = "ssr")]
-pub async fn read_gpx_files(filepaths: Vec<String>) -> Result<Vec<Track>, ServerFnError> {
+pub async fn read_gpx_files(filepaths: Vec<String>, resolution:i32) -> Result<Vec<Track>, ServerFnError> {
     // read a bunch of files using some threads
     let futures = filepaths
         .into_iter()
-        .map(|path| async move { read_gpx_file(path).await.unwrap() });
+        .map(|path| async move { read_gpx_file(path, resolution).await.unwrap() });
     let res = join_all(futures).await;
 
     Ok(res)
 }
 
 #[cfg(feature = "ssr")]
-pub async fn read_gpx_file(filepath: String) -> Result<Track, ServerFnError> {
+pub async fn read_gpx_file(filepath: String, resolution:i32) -> Result<Track, ServerFnError> {
     // dbg!(&filepath);
     log!("Parsing: {}", &filepath);
     use tokio::fs;
@@ -50,7 +50,7 @@ pub async fn read_gpx_file(filepath: String) -> Result<Track, ServerFnError> {
             let mut skipper: i32 = 0;
             for waypoint in &seg.points {
                 skipper += 1;
-                if skipper % 50 != 0 {
+                if skipper % resolution != 0 {
                     continue;
                 }
                 let p = Point {

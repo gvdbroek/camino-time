@@ -1,3 +1,4 @@
+use leptos_leaflet::prelude::Position;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
@@ -17,4 +18,25 @@ pub struct Point {
     pub lon: f64,
     // pub ele: Option<f64>,
     // pub time: Option<String>,
+}
+
+impl Track {
+    pub fn get_last_point(&self) -> Option<Point> {
+        if let Some(seg) = self.segments.last() {
+            if let Some(point) = seg.points.last() {
+                let p = point.clone();
+                return Some(p);
+            }
+        }
+        None
+    }
+}
+
+impl From<Point> for Position {
+    fn from(p: Point) -> Position {
+        Position {
+            lat: p.lat,
+            lng: p.lon,
+        }
+    }
 }
