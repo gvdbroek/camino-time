@@ -19,6 +19,7 @@ gpx = "0.10.0"
 serde = { version = "1.0.219", features = ["derive"] }
 leptos-leaflet = "0.9.3"
 futures = "0.3.31"
+server_fn = { version = "0.7.8", features = ["multipart"] }
 
 [features]
 hydrate = [
