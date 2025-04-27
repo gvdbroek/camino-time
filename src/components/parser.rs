@@ -1,6 +1,4 @@
 use gpx::Gpx;
-use std::io::BufReader;
-// use std::fs::File;
 use crate::types::{Point, Segment, Track};
 use futures::future::join_all;
 use gpx::read;

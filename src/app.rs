@@ -10,8 +10,8 @@ use leptos_router::{
     StaticSegment,
 };
 use serde::{Deserialize, Serialize};
-use std::fs::File;
-use std::io::BufReader;
+// use std::fs::File;
+// use std::io::BufReader;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -63,90 +63,4 @@ fn HomePage() -> impl IntoView {
     view! {
         <GpxMap></GpxMap>
     }
-}
-#[component]
-fn HomePage_old() -> impl IntoView {
-    // Creates a reactive value to update the button
-    // let count = RwSignal::new(0);
-    // let on_click = move |_| *count.write() += 1;
-    let resource = OnceResource::new(server_func());
-
-    view! {
-            <h1>"Welcome to Camino Time 2025!"</h1>
-            // <button on:click=on_click>"Click Me: " {count}</button>
-            <Suspense
-    fallback= {move || view!{<p>"loading"</p>}}
-                >
-                {move ||
-                    resource.get().map(|d| view!{<NetDataShower data=d.unwrap()> </NetDataShower>})
-                }
-            </Suspense>
-        }
-}
-#[component]
-pub fn NetDataShower_Old(data: ListData) -> impl IntoView {
-    log!("Net Data Shower is showing...");
-    view! {<ul>
-    {data.numbers.into_iter()
-        .map(|n| view! { <li>{n.lat}"//"{n.lon}</li>})
-        .collect_view()}
-    </ul>}
-}
-
-#[component]
-pub fn NetDataShower(data: ListData) -> impl IntoView {
-    let mut positions: Vec<Position> = vec![];
-    for netdata in data.numbers.clone() {
-        let newp = Position {
-            lat: netdata.lat,
-            lng: netdata.lon,
-        };
-        positions.push(newp);
-    }
-    let first_point = data.numbers[0].clone();
-    let first_pos = Position {
-        lat: first_point.lat,
-        lng: first_point.lon,
-    };
-
-    view! {
-
-          <MapContainer style="height: 400px" center=Position::new(51.505, -0.09) zoom=13.0 set_view=true>
-              <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"/>
-                <Polyline positions=positions weight=5.0/>
-            <Circle center=first_pos color="blue" radius=20.0/>
-            </MapContainer>
-    }
-}
-
-#[server]
-pub async fn server_func() -> Result<ListData, ServerFnError> {
-    // This XML file actually exists — try it for yourself!
-    let file = File::open("/home/laika/code/exp/ssr-test/sample.gpx").unwrap();
-    let reader = BufReader::new(file);
-
-    // read takes any io::Read and gives a Result<Gpx, Error>.
-    let gpx: Gpx = read(reader).unwrap();
-    let mut datalist: ListData = ListData { numbers: vec![] };
-
-    for point in gpx.tracks[0].segments[0].points.clone() {
-        let d = NetData {
-            lat: point.point().y(),
-            lon: point.point().x(),
-        };
-        datalist.numbers.push(d);
-    }
-    log!("Server func executed");
-    Ok(datalist)
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct NetData {
-    lat: f64,
-    lon: f64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ListData {
-    numbers: Vec<NetData>,
 }

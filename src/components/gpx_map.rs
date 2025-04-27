@@ -12,7 +12,9 @@ pub fn GpxMap()-> impl IntoView{
 
     // let tracks : Vec<Track> = vec![];
     view!{
-        <Suspense>
+        <Suspense
+            fallback=move || view!{<GpxMapPlaceholder/>}
+        >
             {
             move ||
             // log!("Getting server gpx files!");
@@ -24,6 +26,17 @@ pub fn GpxMap()-> impl IntoView{
              // <GpxMapTrackViewer tracks=tracks />
         </Suspense>
     }
+}
+#[component]
+fn GpxMapPlaceholder() -> impl IntoView{
+    view!{
+        <div style="height: 801px;">
+        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+        </div>
+    }
+    // view!{<span class="loader"></span>}
+    // view!{<h1>"LOADING..."</h1>}
+
 }
 
 #[component]
