@@ -1,17 +1,15 @@
 use crate::components::gpx_map::GpxMap;
-use gpx::read;
-use gpx::Gpx;
-use leptos::logging::log;
+use crate::components::submit_form::GpxSubmitForm;
+// use gpx::read;
+// use gpx::Gpx;
+// use leptos::logging::log;
 use leptos::prelude::*;
-use leptos_leaflet::prelude::*;
+// use leptos_leaflet::prelude::*;
 use leptos_meta::{provide_meta_context, MetaTags, Script, Stylesheet, Title};
 use leptos_router::{
     components::{Route, Router, Routes},
     StaticSegment,
 };
-use serde::{Deserialize, Serialize};
-// use std::fs::File;
-// use std::io::BufReader;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -51,6 +49,7 @@ pub fn App() -> impl IntoView {
             <main>
                 <Routes fallback=|| "Page not found.".into_view()>
                     <Route path=StaticSegment("") view=HomePage/>
+                    <Route path=StaticSegment("/submit") view=UploadPage/>
                 </Routes>
             </main>
         </Router>
@@ -62,5 +61,11 @@ pub fn App() -> impl IntoView {
 fn HomePage() -> impl IntoView {
     view! {
         <GpxMap></GpxMap>
+    }
+}
+#[component]
+fn UploadPage() -> impl IntoView{
+    view!{
+        <GpxSubmitForm/>
     }
 }

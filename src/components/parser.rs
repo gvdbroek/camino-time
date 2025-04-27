@@ -1,10 +1,12 @@
-use gpx::Gpx;
 use crate::types::{Point, Segment, Track};
-use futures::future::join_all;
-use gpx::read;
-use leptos::logging::log;
-use leptos::prelude::*;
 
+#[cfg(feature = "ssr")]
+use leptos::prelude::*;
+#[cfg(feature = "ssr")]
+use leptos::logging::log;
+
+
+#[allow(dead_code)]
 fn sample_track() -> Track {
     let p0 = Point { lat: 0.0, lon: 0.0 };
     let p1 = Point { lat: 5.0, lon: 5.0 };
@@ -21,6 +23,7 @@ fn sample_track() -> Track {
 #[cfg(feature = "ssr")]
 pub async fn read_gpx_files(filepaths: Vec<String>, resolution:i32) -> Result<Vec<Track>, ServerFnError> {
     // read a bunch of files using some threads
+    use futures::future::join_all;
     let futures = filepaths
         .into_iter()
         .map(|path| async move { read_gpx_file(path, resolution).await.unwrap() });
@@ -31,7 +34,8 @@ pub async fn read_gpx_files(filepaths: Vec<String>, resolution:i32) -> Result<Ve
 
 #[cfg(feature = "ssr")]
 pub async fn read_gpx_file(filepath: String, resolution:i32) -> Result<Track, ServerFnError> {
-    // dbg!(&filepath);
+    use gpx::read;
+    use gpx::Gpx;
     log!("Parsing: {}", &filepath);
     use tokio::fs;
 
