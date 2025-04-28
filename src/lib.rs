@@ -1,5 +1,6 @@
 pub mod app;
 pub mod components;
+pub mod homepage;
 pub mod types;
 
 #[cfg(feature = "hydrate")]

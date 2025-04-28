@@ -3,6 +3,7 @@ use crate::components::submit_form::GpxSubmitForm;
 // use gpx::read;
 // use gpx::Gpx;
 // use leptos::logging::log;
+use crate::homepage::HomePage;
 use leptos::prelude::*;
 // use leptos_leaflet::prelude::*;
 use leptos_meta::{provide_meta_context, MetaTags, Script, Stylesheet, Title};
@@ -40,7 +41,6 @@ pub fn App() -> impl IntoView {
         // injects a stylesheet into the document <head>
         // id=leptos means cargo-leptos will hot-reload this stylesheet
         <Stylesheet id="leptos" href="/pkg/ssr-test.css"/>
-
         // sets the document title
         <Title text="Welcome to Camino Time!"/>
 
@@ -58,14 +58,8 @@ pub fn App() -> impl IntoView {
 
 /// Renders the home page of your application.
 #[component]
-fn HomePage() -> impl IntoView {
+fn UploadPage() -> impl IntoView {
     view! {
-        <GpxMap></GpxMap>
-    }
-}
-#[component]
-fn UploadPage() -> impl IntoView{
-    view!{
         <GpxSubmitForm/>
     }
 }

@@ -3,13 +3,13 @@ use crate::components::{colors, parser};
 // use crate::components::parser;
 use crate::types::{Point, Segment, Track};
 #[allow(unused_imports)]
-use leptos::logging::{log};
+use leptos::logging::log;
 use leptos::prelude::*;
 use leptos_leaflet::prelude::*;
 
 #[component]
 pub fn GpxMap() -> impl IntoView {
-    let res = 30;
+    let res = 20;
     let tracks_resource = OnceResource::new(get_gpx_tracks(res));
 
     // let tracks : Vec<Track> = vec![];
@@ -46,9 +46,15 @@ fn GpxMapTrackViewer(tracks: Vec<Track>) -> impl IntoView {
     // let base_color: String = "red".to_string();
     let gr_l = "3a7bd5";
     let gr_r = "3a6073";
+    let darkmap = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+    let tilemap = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+    let topomap = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png";
+    let stamenmap = "https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg";
+    // let stamenmap = "https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg";
+    let map_url = tilemap;
     view! {
-        <MapContainer style="height: 801px" center=start_pos zoom=9.0 set_view=true>
-            <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"/>
+        <MapContainer style="height: 800px" center=start_pos zoom=8.0 set_view=true>
+            <TileLayer url=map_url attribution="&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"/>
         {
                 let mut counter: i32 = 0;
                 let mut track_views = vec![];
