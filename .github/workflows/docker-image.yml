@@ -14,5 +14,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag camino-time:$(date +%s)
+#    - name: Build the Docker image
+#      run: docker build . --file Dockerfile --tag camino-time:$(date +%s)
+    - name: Publish Image
+      uses: matootie/github-docker@v3.0.0
+      with:
+        accessToken: ${{ github.token }}
