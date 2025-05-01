@@ -1,22 +1,45 @@
 name: Docker Image CI
-
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
+    
+  
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  USERNAME: ${{ github.actor }}
+  REGISTRY: ghcr.io
+  NAMESPACE: ${{ github.actor }}
+  IMAGE_NAME: camino-time
+  TAG: $(date +%s)
 
+  
 jobs:
-
-  build:
-
+  build_container:
+    #if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-#    - name: Build the Docker image
-#      run: docker build . --file Dockerfile --tag camino-time:$(date +%s)
-    - name: Publish Image
-      uses: matootie/github-docker@v3.0.0
-      with:
-        accessToken: ${{ github.token }}
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}   # checkout the correct branch name
+          fetch-depth: 0                # fetch the whole repo history
+
+      - name: Git Version
+        id: version
+        uses: codacy/git-version@2.7.1
+      
+      - name: Use the version
+        run: |
+          echo ${{ steps.version.outputs.version }}
+      - name: Use the previous version
+        run: |
+          echo ${{ steps.version.outputs.previous-version }}
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --target prod --build-arg BASE_URL=$BASE_URL --build-arg API_URL=$API_URL --build-arg API_KEY=$API_KEY --tag ghcr.io/${{ github.actor }}/wifi-log-web:latest --tag ghcr.io/${{ github.actor }}/wifi-log-web:${{ steps.version.outputs.version }}
+        
+      - name: ghcr login
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login $REGISTRY -u $USERNAME --password-stdin
+      - name: ghrc push latest
+        run: docker push ghcr.io/${{ github.actor }}/wifi-log-web:latest
+      - name: ghrc push versioned
+        run: docker push ghcr.io/${{ github.actor }}/wifi-log-web:${{ steps.version.outputs.version }}
+        
