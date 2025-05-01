@@ -33,12 +33,12 @@ jobs:
         run: |
           echo ${{ steps.version.outputs.previous-version }}
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag ghcr.io/${{ github.actor }}/${{ IMAGE_NAME }}:latest --tag ghcr.io/${{ github.actor }}/${{ IMAGE_NAME }}:${{ steps.version.outputs.version }}
+        run: docker build . --file Dockerfile --tag ghcr.io/${{ github.actor }}/camino-time:latest --tag ghcr.io/${{ github.actor }}/camino-time:${{ steps.version.outputs.version }}
         
       - name: ghcr login
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login $REGISTRY -u $USERNAME --password-stdin
       - name: ghrc push latest
-        run: docker push ghcr.io/${{ github.actor }}/${{ IMAGE_NAME }}:latest
+        run: docker push ghcr.io/${{ github.actor }}/camino-time:latest
       - name: ghrc push versioned
-        run: docker push ghcr.io/${{ github.actor }}/${{ IMAGE_NAME }}:${{ steps.version.outputs.version }}
+        run: docker push ghcr.io/${{ github.actor }}/camino-time:${{ steps.version.outputs.version }}
         
