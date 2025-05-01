@@ -149,12 +149,16 @@ pub fn read_gpx_from_dir(path: &String) -> Result<Vec<String>, ServerFnError> {
     let readdir = std::fs::read_dir(path)?;
     let mut paths: Vec<String> = vec![];
 
-    for entry in readdir {
-        // dbg!(&entry);
-        if let Ok(e) = entry {
-            let path = e.path().into_os_string().into_string().unwrap();
+    for entry in readdir.flatten() {
+        // if let Ok(e) = entry {
+            let entrypath = entry.path();
+            if let Some(extension) = &entrypath.extension(){
+                if(extension.to_str().unwrap() != "gpx") {continue;}
+            }
+        
+            let path = entry.path().into_os_string().into_string().unwrap();
             paths.push(path);
-        }
+        // }
     }
     Ok(paths.clone())
 }
