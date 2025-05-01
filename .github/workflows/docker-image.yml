@@ -14,7 +14,6 @@ env:
   
 jobs:
   build_container:
-    #if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -34,12 +33,12 @@ jobs:
         run: |
           echo ${{ steps.version.outputs.previous-version }}
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --target prod --build-arg BASE_URL=$BASE_URL --build-arg API_URL=$API_URL --build-arg API_KEY=$API_KEY --tag ghcr.io/${{ github.actor }}/wifi-log-web:latest --tag ghcr.io/${{ github.actor }}/wifi-log-web:${{ steps.version.outputs.version }}
+        run: docker build . --file Dockerfile --tag ghcr.io/${{ github.actor }}/$IMAGE_NAME:latest --tag ghcr.io/${{ github.actor }}/$IMAGE_NAME:${{ steps.version.outputs.version }}
         
       - name: ghcr login
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login $REGISTRY -u $USERNAME --password-stdin
       - name: ghrc push latest
-        run: docker push ghcr.io/${{ github.actor }}/wifi-log-web:latest
+        run: docker push ghcr.io/${{ github.actor }}/$IMAGE_NAME:latest
       - name: ghrc push versioned
-        run: docker push ghcr.io/${{ github.actor }}/wifi-log-web:${{ steps.version.outputs.version }}
+        run: docker push ghcr.io/${{ github.actor }}/$IMAGE_NAME:${{ steps.version.outputs.version }}
         
