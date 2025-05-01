@@ -30,6 +30,7 @@ ENV LEPTOS_SITE_ADDR="0.0.0.0:8080"
 ENV LEPTOS_SITE_ROOT=./site
 EXPOSE 8080
 
-RUN install -d /app/camino-time/uploads
+RUN mkdir -p /app/camino-time/uploads
+# RUN install -d /app/camino-time/uploads
 
 CMD ["/app/camino-time"]
