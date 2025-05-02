@@ -45,11 +45,11 @@ pub fn App() -> impl IntoView {
         <Title text="Welcome to Camino Time!"/>
 
         // content for this welcome page
-        <Router>
+        <Router base="web/camino">
             <main>
                 <Routes fallback=|| "Page not found.".into_view()>
                     <Route path=StaticSegment("") view=HomePage/>
-                    <Route path=StaticSegment("/submit") view=UploadPage/>
+                    // <Route path=StaticSegment("/submit") view=UploadPage/>
                 </Routes>
             </main>
         </Router>
