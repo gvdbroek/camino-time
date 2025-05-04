@@ -11,7 +11,7 @@ pub fn HomePage() -> impl IntoView {
                     <GpxMap></GpxMap>
                 </div>
                 <div class="infobox">
-            <Statblock />
+                    <Statblock />
                 </div>
             </div>
         </div>

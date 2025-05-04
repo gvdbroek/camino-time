@@ -63,8 +63,6 @@ $fade-end-color: #22222200;
     // tweak the colors if you want to match your background instead of white
 }
 
-
-
 .navbar {
   background-color: #3B54A6;
   padding: 0.5rem 1rem;
@@ -112,7 +110,8 @@ $fade-end-color: #22222200;
 #left {
   flex: 1;
    // background-color: red;
-  height: 100%;
+  // height: 100%;
+  height: 100vw;
   overflow: hidden;
   // width: 70vw;
 
@@ -139,31 +138,34 @@ $fade-end-color: #22222200;
 
 
 .statblock{
+  position: absolute;
   background-color: #DFDFDF;
   font-family: 'VT323', monospace;
   font-size: 1.5rem;
   font-weight: 500;
-    margin: auto;
-  width: 90%;
+  margin: auto;
+  width: 25rem;
   padding: 5px;
-  // color: white;
-  h3{
-    margin: 0;
-  }
-
+  top: 2rem;
+  right: 2rem;
 }
 
 .map-container{
+  width: 100%;
+  overflow: hidden;
+}
 
+.infobox:hover{
+  opacity: 90%;
+  transition: all 0.1s ease-in;
 }
 
 .infobox{
   display: block;
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
+  position: relative;
+  opacity: 40%;
   z-index: 1000;
-
+  transition: all 0.1s ease-out;
 }
 
 @media (max-width: 768px) {
@@ -171,12 +173,29 @@ $fade-end-color: #22222200;
     flex-direction: column;
   }
   .app {
+    width: 100vw;
     flex-direction: column;
   }
+
+  .infobox{
+
+    width: 100vw;
+
+  }
+  .statblock{
+    width: 100%;
+    position: static;
+    h3{
+      margin: 0;
+    }
+  }
+  body{
+    margin:0;
+  }
+
   #left{
     height: 80vh; 
     flex: 3;
-
   }
   #right{
     // height: 80vh; 
