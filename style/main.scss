@@ -61,16 +61,16 @@ $fade-end-color: #22222200;
       // linear-gradient(to left, rgba(255,255,255,1), rgba(255,255,255,0) 10%),
       // linear-gradient(to right, rgba(255,255,255,1), rgba(255,255,255,0) 10%);  
     // tweak the colors if you want to match your background instead of white
-  }
+}
 
 
 
-  .navbar {
+.navbar {
   background-color: #3B54A6;
   padding: 0.5rem 1rem;
-  border-bottom: 1px solid #dee2e6;
+  // border-bottom: 1px solid #dee2e6;
 
-  .container {
+  .navbar-container {
     display: flex;
     align-items: center;
   }
@@ -98,4 +98,95 @@ $fade-end-color: #22222200;
     }
   }
 }
+.app {
+  display: flex;
+  height: 100vh;
 
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+    box-sizing: border-box;
+}
+#left {
+  flex: 1;
+   // background-color: red;
+  height: 100%;
+  overflow: hidden;
+  // width: 70vw;
+
+  /* For your map component */
+  display: flex;
+  flex-direction: column;
+}
+
+#right {
+  width: 30vw;
+   // background-color: green;
+  // flex: 1;
+  height: 100%;
+  flex-direction: column;
+}
+
+
+.sidebar{
+  font-family: "sans-serif";
+  background-color: #F5F5F5;
+  height: 90vh;
+  // padding-top: 1em;
+}
+
+
+.statblock{
+  background-color: #DFDFDF;
+  font-family: 'VT323', monospace;
+  font-size: 1.5rem;
+  font-weight: 500;
+    margin: auto;
+  width: 90%;
+  padding: 5px;
+  // color: white;
+  h3{
+    margin: 0;
+  }
+
+}
+
+.map-container{
+
+}
+
+.infobox{
+  display: block;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  .app {
+    flex-direction: column;
+  }
+  #left{
+    height: 80vh; 
+    flex: 3;
+
+  }
+  #right{
+    // height: 80vh; 
+    flex: 1;
+    height: 30vh;
+    background-color: #222222;
+
+  }
+  #left, #right {
+    width: 100vw;
+    flex-direction: column;
+  }
+}

@@ -1,7 +1,7 @@
 #[allow(unused_imports)]
 use crate::components::{colors, parser};
 // use crate::components::parser;
-use crate::types::{Point, Segment, Track, GpxData};
+use crate::types::{GpxData, Point, Segment, Track};
 #[allow(unused_imports)]
 use leptos::logging::log;
 use leptos::prelude::*;
@@ -21,11 +21,7 @@ pub fn GpxMap() -> impl IntoView {
             {
             move ||
                 gpx_data.get().map(|re| view!{
-                // let data = re.unwrap();
                 <GpxMapTrackViewer gpx_data=re.unwrap() />
-                // tracks_resource.get().map(|re| view!{
-                //     <GpxMapTrackViewer tracks=re.unwrap() />
-
                 })
         }
         </Suspense>
@@ -53,7 +49,7 @@ fn GpxMapTrackViewer(gpx_data: GpxData) -> impl IntoView {
     // let stamenmap = "https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg";
     let map_url = tilemap;
     view! {
-        <MapContainer style="height: 800px" center=start_pos zoom=8.0 set_view=true>
+        <MapContainer style="height: 90vh; width: 100vw;" center=start_pos zoom=8.0 set_view=true>
             <TileLayer url=map_url attribution="&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"/>
 
             <TrackCollection tracks=gpx_data.clone().underlays gradient_left="5a617a".to_string() gradient_right="5a617a".to_string() />
@@ -64,27 +60,30 @@ fn GpxMapTrackViewer(gpx_data: GpxData) -> impl IntoView {
 }
 
 #[component]
-pub fn TrackCollection(tracks: Vec<Track>, gradient_left:String, gradient_right:String) -> impl IntoView{
+pub fn TrackCollection(
+    tracks: Vec<Track>,
+    gradient_left: String,
+    gradient_right: String,
+) -> impl IntoView {
+    view! {
 
-    view!{
+        {
+            let mut counter: i32 = 0;
+            let mut track_views = vec![];
+            let num_tracks = tracks.len() as i32;
 
-            {
-                let mut counter: i32 = 0;
-                let mut track_views = vec![];
-                let num_tracks = tracks.len() as i32;
-
-                for track in tracks{
-                    counter += 1;
-                    let fade_factor: f32 = (counter as f32 / num_tracks as f32).into();
-                    let lerped_color = colors::color_lerp(gradient_left.as_str(), gradient_right.as_str(), fade_factor);
-                    let v = view!{<GpxTrack track=track color=lerped_color.clone() />};
-                    track_views.push(v);
-
-                }
-                track_views.collect_view()
+            for track in tracks{
+                counter += 1;
+                let fade_factor: f32 = (counter as f32 / num_tracks as f32).into();
+                let lerped_color = colors::color_lerp(gradient_left.as_str(), gradient_right.as_str(), fade_factor);
+                let v = view!{<GpxTrack track=track color=lerped_color.clone() />};
+                track_views.push(v);
 
             }
+            track_views.collect_view()
+
         }
+    }
 }
 
 pub fn has_value(value: Option<Point>) -> bool {
@@ -152,20 +151,22 @@ pub fn read_gpx_from_dir(path: &String) -> Result<Vec<String>, ServerFnError> {
 
     for entry in readdir.flatten() {
         // if let Ok(e) = entry {
-            let entrypath = entry.path();
-            if let Some(extension) = &entrypath.extension(){
-                if extension.to_str().unwrap() != "gpx" {continue;}
+        let entrypath = entry.path();
+        if let Some(extension) = &entrypath.extension() {
+            if extension.to_str().unwrap() != "gpx" {
+                continue;
             }
-        
-            let path = entry.path().into_os_string().into_string().unwrap();
-            paths.push(path);
+        }
+
+        let path = entry.path().into_os_string().into_string().unwrap();
+        paths.push(path);
         // }
     }
     Ok(paths.clone())
 }
 
 #[cfg(feature = "ssr")]
- // #[server]
+// #[server]
 pub async fn get_gpx_tracks(resolution: i32, sub_path: &str) -> Result<Vec<Track>, ServerFnError> {
     let search_path: String = sub_path.to_string();
     let paths = read_gpx_from_dir(&search_path)?;
@@ -179,23 +180,20 @@ pub async fn get_gpx_tracks(resolution: i32, sub_path: &str) -> Result<Vec<Track
     Ok(tracks)
 }
 #[server]
-pub async fn get_all_gpx_data(resolution: i32) -> Result<GpxData, ServerFnError>{
-    
+pub async fn get_all_gpx_data(resolution: i32) -> Result<GpxData, ServerFnError> {
     let gpx_tracks = get_gpx_tracks(resolution, "./uploads").await;
-    let tracks = match gpx_tracks{
+    let tracks = match gpx_tracks {
         Ok(tracks_list) => tracks_list,
-        Err(_) => vec![]
+        Err(_) => vec![],
     };
 
     let underlay_tracks = get_gpx_tracks(resolution, "./underlays").await;
-    let underlays = match underlay_tracks{
+    let underlays = match underlay_tracks {
         Ok(underlays_list) => underlays_list,
-        Err(_) => vec![]
+        Err(_) => vec![],
     };
-    Ok(GpxData{
+    Ok(GpxData {
         tracks: tracks,
-        underlays: underlays
+        underlays: underlays,
     })
-
 }
-
