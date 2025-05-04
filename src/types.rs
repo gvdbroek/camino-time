@@ -2,6 +2,12 @@ use leptos_leaflet::prelude::Position;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct GpxData{
+    pub tracks : Vec<Track>,
+    pub underlays: Vec<Track>,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Track {
     pub name: String,
     pub segments: Vec<Segment>,

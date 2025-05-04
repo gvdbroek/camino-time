@@ -32,5 +32,6 @@ EXPOSE 8080
 
 # RUN mkdir -p /app/camino-time/uploads
 RUN install -d /app/uploads
+RUN install -d /app/underlays
 
 CMD ["/app/camino-time"]

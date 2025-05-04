@@ -1,7 +1,7 @@
 #[allow(unused_imports)]
 use crate::components::{colors, parser};
 // use crate::components::parser;
-use crate::types::{Point, Segment, Track};
+use crate::types::{Point, Segment, Track, GpxData};
 #[allow(unused_imports)]
 use leptos::logging::log;
 use leptos::prelude::*;
@@ -10,7 +10,8 @@ use leptos_leaflet::prelude::*;
 #[component]
 pub fn GpxMap() -> impl IntoView {
     let res = 20;
-    let tracks_resource = OnceResource::new(get_gpx_tracks(res));
+    // let tracks_resource = OnceResource::new(get_gpx_tracks(res));
+    let gpx_data = OnceResource::new(get_all_gpx_data(res));
 
     // let tracks : Vec<Track> = vec![];
     view! {
@@ -19,20 +20,21 @@ pub fn GpxMap() -> impl IntoView {
         >
             {
             move ||
-            // log!("Getting server gpx files!");
-                tracks_resource.get().map(|re| view!{
-                    <GpxMapTrackViewer tracks=re.unwrap() />
+                gpx_data.get().map(|re| view!{
+                let data = re.unwrap();
+                <GpxMapTrackViewer gpx_data=re.unwrap() />
+                // tracks_resource.get().map(|re| view!{
+                //     <GpxMapTrackViewer tracks=re.unwrap() />
 
                 })
         }
-             // <GpxMapTrackViewer tracks=tracks />
         </Suspense>
     }
 }
 #[component]
 fn GpxMapPlaceholder() -> impl IntoView {
     view! {
-        <div style="height: 801px;">
+        <div style="height: 800px;">
         <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
         </div>
     }
@@ -41,11 +43,11 @@ fn GpxMapPlaceholder() -> impl IntoView {
 }
 
 #[component]
-fn GpxMapTrackViewer(tracks: Vec<Track>) -> impl IntoView {
+fn GpxMapTrackViewer(gpx_data: GpxData) -> impl IntoView {
     let start_pos = Position::new(42.211, -8.443);
     // let base_color: String = "red".to_string();
-    let gr_l = "3a7bd5";
-    let gr_r = "3a6073";
+    let gr_l = "3a7bd5".to_string();
+    let gr_r = "3a6073".to_string();
     let darkmap = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
     let tilemap = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
     let topomap = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png";
@@ -55,7 +57,37 @@ fn GpxMapTrackViewer(tracks: Vec<Track>) -> impl IntoView {
     view! {
         <MapContainer style="height: 800px" center=start_pos zoom=8.0 set_view=true>
             <TileLayer url=map_url attribution="&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"/>
-        {
+
+            <TrackCollection tracks=gpx_data.clone().underlays gradient_left="5a617a".to_string() gradient_right="5a617a".to_string() />
+            <TrackCollection tracks=gpx_data.clone().tracks gradient_left=gr_l gradient_right=gr_r />
+        // {
+        //         let mut counter: i32 = 0;
+        //         let mut track_views = vec![];
+        //         let num_tracks = tracks.len() as i32;
+        //
+        //         for track in tracks{
+        //             counter += 1;
+        //             let fade_factor: f32 = (counter as f32 / num_tracks as f32).into();
+        //             let lerped_color = colors::color_lerp(gr_l, gr_r, fade_factor);
+        //
+        //             let v = view!{<GpxTrack track=track color=lerped_color.clone() />};
+        //             track_views.push(v);
+        //
+        //         }
+        //         track_views.collect_view()
+        //
+        // }
+        </MapContainer>
+
+    }
+}
+
+#[component]
+pub fn TrackCollection(tracks: Vec<Track>, gradient_left:String, gradient_right:String) -> impl IntoView{
+
+    view!{
+
+            {
                 let mut counter: i32 = 0;
                 let mut track_views = vec![];
                 let num_tracks = tracks.len() as i32;
@@ -63,27 +95,15 @@ fn GpxMapTrackViewer(tracks: Vec<Track>) -> impl IntoView {
                 for track in tracks{
                     counter += 1;
                     let fade_factor: f32 = (counter as f32 / num_tracks as f32).into();
-                    let lerped_color = colors::color_lerp(gr_l, gr_r, fade_factor);
-
+                    let lerped_color = colors::color_lerp(gradient_left.as_str(), gradient_right.as_str(), fade_factor);
                     let v = view!{<GpxTrack track=track color=lerped_color.clone() />};
                     track_views.push(v);
 
                 }
                 track_views.collect_view()
-                // tracks.into_iter()
-                //     .map(|track| view!{<GpxTrack track=track color=base_color.clone() />})
-                //     .collect_view()
+
+            }
         }
-        </MapContainer>
-        // <MapContainer style="height: 801px" center=start_pos zoom=9.0 set_view=true>
-        //     <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"/>
-        // {
-        //         tracks.into_iter()
-        //             .map(|track| view!{<GpxTrack track=track color=base_color.clone() />})
-        //             .collect_view()
-        // }
-        // </MapContainer>
-    }
 }
 
 pub fn has_value(value: Option<Point>) -> bool {
@@ -163,9 +183,10 @@ pub fn read_gpx_from_dir(path: &String) -> Result<Vec<String>, ServerFnError> {
     Ok(paths.clone())
 }
 
-#[server]
-pub async fn get_gpx_tracks(resolution: i32) -> Result<Vec<Track>, ServerFnError> {
-    let search_path: String = "./uploads".to_string();
+#[cfg(feature = "ssr")]
+ // #[server]
+pub async fn get_gpx_tracks(resolution: i32, sub_path: &str) -> Result<Vec<Track>, ServerFnError> {
+    let search_path: String = sub_path.to_string();
     let paths = read_gpx_from_dir(&search_path)?;
 
     let mut tracks = parser::read_gpx_files(paths, resolution).await.unwrap();
@@ -176,3 +197,24 @@ pub async fn get_gpx_tracks(resolution: i32) -> Result<Vec<Track>, ServerFnError
     log!("Collected {} tracks", &tracks.len());
     Ok(tracks)
 }
+#[server]
+pub async fn get_all_gpx_data(resolution: i32) -> Result<GpxData, ServerFnError>{
+    
+    let gpx_tracks = get_gpx_tracks(resolution, "./uploads").await;
+    let tracks = match gpx_tracks{
+        Ok(tracks_list) => tracks_list,
+        Err(_) => vec![]
+    };
+
+    let underlay_tracks = get_gpx_tracks(resolution, "./underlays").await;
+    let underlays = match underlay_tracks{
+        Ok(underlays_list) => underlays_list,
+        Err(_) => vec![]
+    };
+    Ok(GpxData{
+        tracks: tracks,
+        underlays: underlays
+    })
+
+}
+

@@ -6,7 +6,7 @@ use crate::components::submit_form::GpxSubmitForm;
 use crate::homepage::HomePage;
 use leptos::prelude::*;
 // use leptos_leaflet::prelude::*;
-use leptos_meta::{provide_meta_context, MetaTags, Script, Stylesheet, Title};
+use leptos_meta::{provide_meta_context, Link, MetaTags, Script, Stylesheet, Title};
 use leptos_router::{
     components::{Route, Router, Routes},
     StaticSegment,
@@ -21,6 +21,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <meta name="viewport" content="width=device-width, initial-scale=1"/>
                 <Stylesheet href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
                 <Script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"/>
+                <Link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"/>
                 <AutoReload options=options.clone() />
                 <HydrationScripts options/>
                 <MetaTags/>
@@ -53,13 +54,5 @@ pub fn App() -> impl IntoView {
                 </Routes>
             </main>
         </Router>
-    }
-}
-
-/// Renders the home page of your application.
-#[component]
-fn UploadPage() -> impl IntoView {
-    view! {
-        <GpxSubmitForm/>
     }
 }
