@@ -21,7 +21,7 @@ pub fn GpxMap() -> impl IntoView {
             {
             move ||
                 gpx_data.get().map(|re| view!{
-                let data = re.unwrap();
+                // let data = re.unwrap();
                 <GpxMapTrackViewer gpx_data=re.unwrap() />
                 // tracks_resource.get().map(|re| view!{
                 //     <GpxMapTrackViewer tracks=re.unwrap() />
@@ -38,8 +38,6 @@ fn GpxMapPlaceholder() -> impl IntoView {
         <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
         </div>
     }
-    // view!{<span class="loader"></span>}
-    // view!{<h1>"LOADING..."</h1>}
 }
 
 #[component]
@@ -60,23 +58,6 @@ fn GpxMapTrackViewer(gpx_data: GpxData) -> impl IntoView {
 
             <TrackCollection tracks=gpx_data.clone().underlays gradient_left="5a617a".to_string() gradient_right="5a617a".to_string() />
             <TrackCollection tracks=gpx_data.clone().tracks gradient_left=gr_l gradient_right=gr_r />
-        // {
-        //         let mut counter: i32 = 0;
-        //         let mut track_views = vec![];
-        //         let num_tracks = tracks.len() as i32;
-        //
-        //         for track in tracks{
-        //             counter += 1;
-        //             let fade_factor: f32 = (counter as f32 / num_tracks as f32).into();
-        //             let lerped_color = colors::color_lerp(gr_l, gr_r, fade_factor);
-        //
-        //             let v = view!{<GpxTrack track=track color=lerped_color.clone() />};
-        //             track_views.push(v);
-        //
-        //         }
-        //         track_views.collect_view()
-        //
-        // }
         </MapContainer>
 
     }
@@ -173,7 +154,7 @@ pub fn read_gpx_from_dir(path: &String) -> Result<Vec<String>, ServerFnError> {
         // if let Ok(e) = entry {
             let entrypath = entry.path();
             if let Some(extension) = &entrypath.extension(){
-                if(extension.to_str().unwrap() != "gpx") {continue;}
+                if extension.to_str().unwrap() != "gpx" {continue;}
             }
         
             let path = entry.path().into_os_string().into_string().unwrap();
