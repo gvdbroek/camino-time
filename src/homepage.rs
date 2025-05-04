@@ -1,4 +1,5 @@
 use crate::components::gpx_map::GpxMap;
+use crate::types::StatblockData;
 use leptos::prelude::*;
 
 #[component]
@@ -15,33 +16,21 @@ pub fn HomePage() -> impl IntoView {
                 </div>
             </div>
         </div>
-        // <div class="container">
-        //     <Banner/>
-        //     <div class="app">
-        //         <div id="left">
-        //             <GpxMap></GpxMap>
-        //         </div>
-        //         <div id="right">
-        //             <SideBar />
-        //         </div>
-        //     </div>
-        // </div>
     }
 }
 
 #[component]
 pub fn Banner() -> impl IntoView {
     view! {
-
-    <nav class="navbar">
-                <div class="navbar-container">
-                    <a class="navbar-brand" href="#">
-                        <img src="CaminoLogo.jpg" alt="Logo" class="logo" />
-                        <span class="site-title">CAMINO TIME 2025</span>
-                    </a>
-                </div>
-            </nav>
-        }
+        <nav class="navbar">
+            <div class="navbar-container">
+                <a class="navbar-brand" href="#">
+                    <img src="CaminoLogo.jpg" alt="Logo" class="logo" />
+                    <span class="site-title">CAMINO TIME 2025</span>
+                </a>
+            </div>
+        </nav>
+    }
 }
 
 #[component]
@@ -56,15 +45,23 @@ pub fn SideBar() -> impl IntoView {
 }
 #[component]
 pub fn Statblock() -> impl IntoView {
+    let (stats, set_stats) = signal(StatblockData {
+        asc_total: 300.0,
+        days: 9,
+        km_total: 200.0,
+        dsc_total: 30.0,
+        speed_avg: 3.5,
+    });
+
     view! {
         <div class="statblock">
         <h3>Stats</h3>
         <p>
-            <span>"Days walked: 10"</span><br/>
-            <span>"Km's walked: 200km"</span><br/>
-            <span>"Total ascended: x"</span><br/>
-            <span>"Total descended: x"</span><br/>
-            <span>"Average speed: x"</span><br/>
+            <span>"Days walked: " {stats.get().days}</span><br/>
+            <span>"Km's walked: " {stats.get().km_total}</span><br/>
+            <span>"Total ascended  (m): "{stats.get().asc_total}</span><br/>
+            <span>"Total descended (m): "{stats.get().dsc_total}</span><br/>
+            <span>"Average speed (km/h): "{stats.get().speed_avg}</span><br/>
         </p>
         </div>
 

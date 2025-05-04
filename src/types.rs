@@ -2,8 +2,8 @@ use leptos_leaflet::prelude::Position;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct GpxData{
-    pub tracks : Vec<Track>,
+pub struct GpxData {
+    pub tracks: Vec<Track>,
     pub underlays: Vec<Track>,
 }
 
@@ -24,6 +24,15 @@ pub struct Point {
     pub lon: f64,
     // pub ele: Option<f64>,
     // pub time: Option<String>,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct StatblockData {
+    pub days: i32,
+    pub km_total: f64,
+    pub asc_total: f64,
+    pub dsc_total: f64,
+    pub speed_avg: f64,
 }
 
 impl Track {
