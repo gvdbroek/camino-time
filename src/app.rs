@@ -21,7 +21,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <meta name="viewport" content="width=device-width, initial-scale=1"/>
                 <Stylesheet href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
                 <Script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"/>
-                <Link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"/>
+                // <Link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"/>
                 <AutoReload options=options.clone() />
                 <HydrationScripts options/>
                 <MetaTags/>
