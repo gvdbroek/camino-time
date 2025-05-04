@@ -6,6 +6,7 @@ use crate::components::submit_form::GpxSubmitForm;
 use crate::homepage::HomePage;
 use leptos::prelude::*;
 // use leptos_leaflet::prelude::*;
+use crate::types::StatblockData;
 use leptos_meta::{provide_meta_context, Link, MetaTags, Script, Stylesheet, Title};
 use leptos_router::{
     components::{Route, Router, Routes},
@@ -37,6 +38,17 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
+
+    let (stats, set_stats) = signal(StatblockData {
+        asc_total: 0.0,
+        days: 0,
+        km_total: 0.0,
+        dsc_total: 0.0,
+        speed_avg: 0.0,
+    });
+
+    provide_context(stats);
+    provide_context(set_stats);
 
     view! {
         // injects a stylesheet into the document <head>

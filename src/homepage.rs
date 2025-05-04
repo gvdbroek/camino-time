@@ -37,32 +37,24 @@ pub fn Banner() -> impl IntoView {
 pub fn SideBar() -> impl IntoView {
     view! {
         <div class="sidebar">
-        <Statblock />
-
-
+            <Statblock />
         </div>
     }
 }
 #[component]
 pub fn Statblock() -> impl IntoView {
-    let (stats, set_stats) = signal(StatblockData {
-        asc_total: 300.0,
-        days: 9,
-        km_total: 200.0,
-        dsc_total: 30.0,
-        speed_avg: 3.5,
-    });
+    let stats = use_context::<ReadSignal<StatblockData>>();
 
     view! {
         <div class="statblock">
-        <h3>Stats</h3>
-        <p>
-            <span>"Days walked: " {stats.get().days}</span><br/>
-            <span>"Km's walked: " {stats.get().km_total}</span><br/>
-            <span>"Total ascended  (m): "{stats.get().asc_total}</span><br/>
-            <span>"Total descended (m): "{stats.get().dsc_total}</span><br/>
-            <span>"Average speed (km/h): "{stats.get().speed_avg}</span><br/>
-        </p>
+            <h3>Stats</h3>
+            <p>
+                <span>"Days walked: " { move || stats.get().unwrap().days}</span><br/>
+                <span>"Km's walked: " {move || stats.get().unwrap().km_total}</span><br/>
+                <span>"Total ascended  (m): "{ move|| stats.get().unwrap().asc_total}</span><br/>
+                <span>"Total descended (m): "{ move || stats.get().unwrap().dsc_total}</span><br/>
+                <span>"Average speed (km/h): "{ move ||stats.get().unwrap().speed_avg}</span><br/>
+            </p>
         </div>
 
     }

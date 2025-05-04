@@ -26,7 +26,7 @@ pub struct Point {
     // pub time: Option<String>,
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug, Default)]
 pub struct StatblockData {
     pub days: i32,
     pub km_total: f64,

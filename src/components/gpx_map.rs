@@ -1,7 +1,7 @@
 #[allow(unused_imports)]
 use crate::components::{colors, parser};
 // use crate::components::parser;
-use crate::types::{GpxData, Point, Segment, Track};
+use crate::types::{GpxData, Point, Segment, Track, StatblockData};
 #[allow(unused_imports)]
 use leptos::logging::log;
 use leptos::prelude::*;
@@ -13,20 +13,49 @@ pub fn GpxMap() -> impl IntoView {
     // let tracks_resource = OnceResource::new(get_gpx_tracks(res));
     let gpx_data = OnceResource::new(get_all_gpx_data(res));
 
+    // let (stats, set_stats) = signal(StatblockData {
+    //     asc_total: 0.0,
+    //     days: 0,
+    //     km_total: 0.0,
+    //     dsc_total: 0.0,
+    //     speed_avg: 0.0,
+    // });
+
+    // provide_context(stats);
+
+    let set_stats = use_context::<WriteSignal<StatblockData>>().unwrap();
+
+
     // let tracks : Vec<Track> = vec![];
     view! {
         <Suspense
             fallback=move || view!{<GpxMapPlaceholder/>}
         >
-            {
+        {
             move ||
                 gpx_data.get().map(|re| view!{
-                <GpxMapTrackViewer gpx_data=re.unwrap() />
+                    {
+                    let d =load_statsblock_data(re.as_ref().unwrap());
+                    set_stats.set(d);
+                    }
+                    <GpxMapTrackViewer gpx_data=re.unwrap() />
                 })
         }
         </Suspense>
     }
 }
+
+fn load_statsblock_data(data: &GpxData) -> StatblockData{
+    log!("Loading new statblock");
+    StatblockData {
+        asc_total: 300.0,
+        days: 1,
+        km_total: 200.0,
+        dsc_total: 30.0,
+        speed_avg: 3.5,
+    }
+}
+
 #[component]
 fn GpxMapPlaceholder() -> impl IntoView {
     view! {
@@ -42,10 +71,10 @@ fn GpxMapTrackViewer(gpx_data: GpxData) -> impl IntoView {
     // let base_color: String = "red".to_string();
     let gr_l = "3a7bd5".to_string();
     let gr_r = "3a6073".to_string();
-    let darkmap = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+    // let darkmap = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
     let tilemap = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-    let topomap = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png";
-    let stamenmap = "https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg";
+    // let topomap = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png";
+    // let stamenmap = "https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg";
     // let stamenmap = "https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg";
     let map_url = tilemap;
     view! {
@@ -160,7 +189,6 @@ pub fn read_gpx_from_dir(path: &String) -> Result<Vec<String>, ServerFnError> {
 
         let path = entry.path().into_os_string().into_string().unwrap();
         paths.push(path);
-        // }
     }
     Ok(paths.clone())
 }
@@ -179,6 +207,7 @@ pub async fn get_gpx_tracks(resolution: i32, sub_path: &str) -> Result<Vec<Track
     log!("Collected {} tracks", &tracks.len());
     Ok(tracks)
 }
+
 #[server]
 pub async fn get_all_gpx_data(resolution: i32) -> Result<GpxData, ServerFnError> {
     let gpx_tracks = get_gpx_tracks(resolution, "./uploads").await;
