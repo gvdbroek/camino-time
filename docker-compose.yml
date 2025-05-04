@@ -1,7 +1,6 @@
 services:
   camino-time:
     build:
-      # image: camono-time-dev
       dockerfile: Dockerfile
     ports:
       - "3000:8080"
