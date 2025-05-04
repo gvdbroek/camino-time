@@ -1,0 +1,15 @@
+services:
+  camino-time:
+    build:
+      # image: camono-time-dev
+      dockerfile: Dockerfile
+    ports:
+      - "3000:8080"
+    volumes:
+      - ./underlays:/app/underlays/
+      - ./uploads:/app/uploads/
+    environment:
+      - LEPTOS_SITE_ADDR=0.0.0.0:8080
+      - LEPTOS_SITE_ROOT=./site
+
+
