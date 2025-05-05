@@ -29,9 +29,10 @@ pub fn GpxMap() -> impl IntoView {
 
 fn load_statsblock_data(data: &GpxData) -> StatblockData{
     log!("Loading new statblock");
+    let num_tracks = data.tracks.len();
     StatblockData {
         asc_total: 300.0,
-        days: 1,
+        days: num_tracks as i32,
         km_total: 200.0,
         dsc_total: 30.0,
         speed_avg: 3.5,
