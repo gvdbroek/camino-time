@@ -39,25 +39,18 @@ pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
 
-    let (stats, set_stats) = signal(StatblockData {
-        asc_total: 0.0,
-        days: 0,
-        km_total: 0.0,
-        dsc_total: 0.0,
-        speed_avg: 0.0,
-    });
 
-    provide_context(stats);
-    provide_context(set_stats);
+    // set_stats.set(StatblockData {
+    //     asc_total: 0.0,
+    //     days: 10,
+    //     km_total: 0.0,
+    //     dsc_total: 0.0,
+    //     speed_avg: 0.0,
+    // });
 
     view! {
-        // injects a stylesheet into the document <head>
-        // id=leptos means cargo-leptos will hot-reload this stylesheet
         <Stylesheet id="leptos" href="/pkg/camino-time.css"/>
-        // sets the document title
         <Title text="Welcome to Camino Time!"/>
-
-        // content for this welcome page
         <Router>
             <main>
                 <Routes fallback=|| "Page not found.".into_view()>

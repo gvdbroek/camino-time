@@ -1,9 +1,20 @@
 use crate::components::gpx_map::GpxMap;
 use crate::types::StatblockData;
 use leptos::prelude::*;
+use leptos::logging::log;
 
 #[component]
 pub fn HomePage() -> impl IntoView {
+    let (stats, set_stats) = signal(StatblockData {
+        asc_total: 0.0,
+        days: 0,
+        km_total: 0.0,
+        dsc_total: 0.0,
+        speed_avg: 0.0,
+    });
+
+    provide_context(stats);
+    provide_context(set_stats);
     view! {
         <div class="container">
             <Banner/>
@@ -41,19 +52,36 @@ pub fn SideBar() -> impl IntoView {
         </div>
     }
 }
+
 #[component]
 pub fn Statblock() -> impl IntoView {
     let stats = use_context::<ReadSignal<StatblockData>>();
+
+    let (km_walked, set_km_walked) = signal(0.0);
+    let (days_walked, set_days_walked) = signal(0);
+    let (asc_total, set_asc_total) = signal(0.0);
+    let (dsc_total, set_dsc_total) = signal(0.0);
+    let (avg_speed, set_avg_speed) = signal(0.0);
+    
+
+    Effect::new(move |_| {
+        let val = stats.get().unwrap();
+        set_km_walked(val.km_total);
+        set_days_walked(val.days);
+        set_asc_total(val.asc_total);
+        set_dsc_total(val.dsc_total);
+        set_avg_speed(val.speed_avg);
+    });
 
     view! {
         <div class="statblock">
             <h3>Stats</h3>
             <p>
-                <span>"Days walked: " { move || stats.get().unwrap().days}</span><br/>
-                <span>"Km's walked: " {move || stats.get().unwrap().km_total}</span><br/>
-                <span>"Total ascended  (m): "{ move|| stats.get().unwrap().asc_total}</span><br/>
-                <span>"Total descended (m): "{ move || stats.get().unwrap().dsc_total}</span><br/>
-                <span>"Average speed (km/h): "{ move ||stats.get().unwrap().speed_avg}</span><br/>
+                <span>"Days walked: " { days_walked }</span><br/>
+                <span>"Km's walked: " { km_walked}</span><br/>
+                <span>"Total ascended  (m): "{ asc_total }</span><br/>
+                <span>"Total descended (m): "{ dsc_total }</span><br/>
+                <span>"Average speed (km/h): "{ avg_speed }</span><br/>
             </p>
         </div>
 

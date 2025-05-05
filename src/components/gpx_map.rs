@@ -13,20 +13,6 @@ pub fn GpxMap() -> impl IntoView {
     // let tracks_resource = OnceResource::new(get_gpx_tracks(res));
     let gpx_data = OnceResource::new(get_all_gpx_data(res));
 
-    // let (stats, set_stats) = signal(StatblockData {
-    //     asc_total: 0.0,
-    //     days: 0,
-    //     km_total: 0.0,
-    //     dsc_total: 0.0,
-    //     speed_avg: 0.0,
-    // });
-
-    // provide_context(stats);
-
-    let set_stats = use_context::<WriteSignal<StatblockData>>().unwrap();
-
-
-    // let tracks : Vec<Track> = vec![];
     view! {
         <Suspense
             fallback=move || view!{<GpxMapPlaceholder/>}
@@ -34,10 +20,6 @@ pub fn GpxMap() -> impl IntoView {
         {
             move ||
                 gpx_data.get().map(|re| view!{
-                    {
-                    let d =load_statsblock_data(re.as_ref().unwrap());
-                    set_stats.set(d);
-                    }
                     <GpxMapTrackViewer gpx_data=re.unwrap() />
                 })
         }
@@ -67,16 +49,26 @@ fn GpxMapPlaceholder() -> impl IntoView {
 
 #[component]
 fn GpxMapTrackViewer(gpx_data: GpxData) -> impl IntoView {
+
     let start_pos = Position::new(42.211, -8.443);
-    // let base_color: String = "red".to_string();
     let gr_l = "3a7bd5".to_string();
     let gr_r = "3a6073".to_string();
+
     // let darkmap = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
     let tilemap = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-    // let topomap = "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png";
+    // let topomap load_= "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png";
     // let stamenmap = "https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg";
     // let stamenmap = "https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg";
     let map_url = tilemap;
+
+    log!("Retrieving global state statblock");
+    let set_stats = use_context::<WriteSignal<StatblockData>>().unwrap();
+    log!("Got global state statblock");
+    let new_data = load_statsblock_data(&gpx_data);
+    set_stats.set(new_data);
+    log!("Rendering view" );
+
+
     view! {
         <MapContainer style="height: 90vh; width: 100vw;" center=start_pos zoom=8.0 set_view=true>
             <TileLayer url=map_url attribution="&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"/>
