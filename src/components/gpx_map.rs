@@ -1,7 +1,7 @@
 #[allow(unused_imports)]
 use crate::components::{colors, parser};
 // use crate::components::parser;
-use crate::types::{GpxData, Point, Segment, Track, StatblockData};
+use crate::types::{GpxData, Point, Segment, StatblockData, Track};
 #[allow(unused_imports)]
 use leptos::logging::log;
 use leptos::prelude::*;
@@ -27,14 +27,18 @@ pub fn GpxMap() -> impl IntoView {
     }
 }
 
-fn load_statsblock_data(data: &GpxData) -> StatblockData{
+fn load_statsblock_data(data: &GpxData) -> StatblockData {
     log!("Loading new statblock");
     let num_tracks = data.tracks.len();
+    let total_distance : f64 = data.tracks.iter().map( |track| track.segments.iter().map(|seg| seg.length).sum::<f64>() ).sum();
+    let total_rise : f64 = data.tracks.iter().map( |track| track.segments.iter().map(|seg| seg.ascent).sum::<f64>() ).sum();
+    let total_desc : f64 = data.tracks.iter().map( |track| track.segments.iter().map(|seg| seg.descent).sum::<f64>() ).sum();
+
     StatblockData {
-        asc_total: 300.0,
+        asc_total: total_rise,
         days: num_tracks as i32,
-        km_total: 200.0,
-        dsc_total: 30.0,
+        km_total: total_distance,
+        dsc_total: total_desc,
         speed_avg: 3.5,
     }
 }
@@ -50,7 +54,6 @@ fn GpxMapPlaceholder() -> impl IntoView {
 
 #[component]
 fn GpxMapTrackViewer(gpx_data: GpxData) -> impl IntoView {
-
     let start_pos = Position::new(42.211, -8.443);
     let gr_l = "3a7bd5".to_string();
     let gr_r = "3a6073".to_string();
@@ -62,18 +65,16 @@ fn GpxMapTrackViewer(gpx_data: GpxData) -> impl IntoView {
     // let stamenmap = "https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg";
     let map_url = tilemap;
 
-    log!("Retrieving global state statblock");
+    // log!("Retrieving global state statblock");
     let set_stats = use_context::<WriteSignal<StatblockData>>().unwrap();
-    log!("Got global state statblock");
+    // log!("Got global state statblock");
     let new_data = load_statsblock_data(&gpx_data);
     set_stats.set(new_data);
-    log!("Rendering view" );
-
+    // log!("Rendering view");
 
     view! {
         <MapContainer style="height: 90vh; width: 100vw;" center=start_pos zoom=8.0 set_view=true>
             <TileLayer url=map_url attribution="&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"/>
-
             <TrackCollection tracks=gpx_data.clone().underlays gradient_left="5a617a".to_string() gradient_right="5a617a".to_string() />
             <TrackCollection tracks=gpx_data.clone().tracks gradient_left=gr_l gradient_right=gr_r />
         </MapContainer>

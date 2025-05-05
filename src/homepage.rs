@@ -1,7 +1,7 @@
 use crate::components::gpx_map::GpxMap;
 use crate::types::StatblockData;
-use leptos::prelude::*;
 use leptos::logging::log;
+use leptos::prelude::*;
 
 #[component]
 pub fn HomePage() -> impl IntoView {
@@ -57,19 +57,18 @@ pub fn SideBar() -> impl IntoView {
 pub fn Statblock() -> impl IntoView {
     let stats = use_context::<ReadSignal<StatblockData>>();
 
-    let (km_walked, set_km_walked) = signal(0.0);
+    let (km_walked, set_km_walked) = signal("0.00".to_string());
     let (days_walked, set_days_walked) = signal(0);
-    let (asc_total, set_asc_total) = signal(0.0);
-    let (dsc_total, set_dsc_total) = signal(0.0);
+    let (asc_total, set_asc_total) = signal("0.00".to_string());
+    let (dsc_total, set_dsc_total) = signal("0.00".to_string());
     let (avg_speed, set_avg_speed) = signal(0.0);
-    
 
     Effect::new(move |_| {
         let val = stats.get().unwrap();
-        set_km_walked(val.km_total);
         set_days_walked(val.days);
-        set_asc_total(val.asc_total);
-        set_dsc_total(val.dsc_total);
+        set_km_walked(format!("{:.2}", val.km_total));
+        set_asc_total(format!("{:.2}", val.asc_total));
+        set_dsc_total(format!("{:.2}", val.dsc_total));
         set_avg_speed(val.speed_avg);
     });
 
@@ -78,7 +77,7 @@ pub fn Statblock() -> impl IntoView {
             <h3>Stats</h3>
             <p>
                 <span>"Days walked: " { days_walked }</span><br/>
-                <span>"Km's walked: " { km_walked}</span><br/>
+                <span>"Km's walked: " { km_walked }</span><br/>
                 <span>"Total ascended  (m): "{ asc_total }</span><br/>
                 <span>"Total descended (m): "{ dsc_total }</span><br/>
                 <span>"Average speed (km/h): "{ avg_speed }</span><br/>
