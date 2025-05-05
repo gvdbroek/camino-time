@@ -80,7 +80,7 @@ pub fn Statblock() -> impl IntoView {
                 <span>"Km's walked: " { km_walked }</span><br/>
                 <span>"Total ascended  (m): "{ asc_total }</span><br/>
                 <span>"Total descended (m): "{ dsc_total }</span><br/>
-                <span>"Average speed (km/h): "{ avg_speed }</span><br/>
+                // <span>"Average speed (km/h): "{ avg_speed }</span><br/>
             </p>
         </div>
 
