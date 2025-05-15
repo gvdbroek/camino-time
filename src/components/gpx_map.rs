@@ -75,7 +75,7 @@ fn GpxMapTrackViewer(gpx_data: GpxData) -> impl IntoView {
     view! {
         <MapContainer style="height: 90vh; width: 100vw;" center=start_pos zoom=8.0 set_view=true>
             <TileLayer url=map_url attribution="&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"/>
-            <TrackCollection tracks=gpx_data.clone().underlays gradient_left="5a617a".to_string() gradient_right="5a617a".to_string() />
+            <TrackCollection tracks=gpx_data.clone().underlays gradient_left="abb5d6".to_string() gradient_right="abb5d6".to_string() />
             <TrackCollection tracks=gpx_data.clone().tracks gradient_left=gr_l gradient_right=gr_r />
         </MapContainer>
 
