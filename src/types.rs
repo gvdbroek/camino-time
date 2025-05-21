@@ -74,7 +74,7 @@ impl Point{
     // double d = 6367 * c;
     //
     // return d;
-    d
+    d * 1.1
     }
 impl Default for Point {
     fn default() -> Self {
