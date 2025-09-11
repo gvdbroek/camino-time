@@ -10,8 +10,9 @@ use leptos_leaflet::prelude::*;
 #[component]
 pub fn GpxMap() -> impl IntoView {
     let res = 20;
+    let underlay_res: i32 = 1;
     // let tracks_resource = OnceResource::new(get_gpx_tracks(res));
-    let gpx_data = OnceResource::new(get_all_gpx_data(res));
+    let gpx_data = OnceResource::new(get_all_gpx_data(res, underlay_res));
 
     view! {
         <Suspense
@@ -30,9 +31,22 @@ pub fn GpxMap() -> impl IntoView {
 fn load_statsblock_data(data: &GpxData) -> StatblockData {
     log!("Loading new statblock");
     let num_tracks = data.tracks.len();
-    let total_distance : f64 = data.tracks.iter().map( |track| track.segments.iter().map(|seg| seg.length).sum::<f64>() ).sum();
-    let total_rise : f64 = data.tracks.iter().map( |track| track.segments.iter().map(|seg| seg.ascent).sum::<f64>() ).sum();
-    let total_desc : f64 = data.tracks.iter().map( |track| track.segments.iter().map(|seg| seg.descent).sum::<f64>() ).sum();
+    let total_distance: f64 = data
+        .tracks
+        .iter()
+        .map(|track| track.segments.iter().map(|seg| seg.length).sum::<f64>())
+        .sum();
+    let total_rise: f64 = data
+        .tracks
+        .iter()
+        .map(|track| track.segments.iter().map(|seg| seg.ascent).sum::<f64>())
+        .sum();
+    let total_desc: f64 = data
+        .tracks
+        .iter()
+        .map(|track| track.segments.iter().map(|seg| seg.descent).sum::<f64>())
+        .sum();
+    log!("statblock data loaded");
 
     StatblockData {
         asc_total: total_rise,
@@ -54,7 +68,11 @@ fn GpxMapPlaceholder() -> impl IntoView {
 
 #[component]
 fn GpxMapTrackViewer(gpx_data: GpxData) -> impl IntoView {
-    let start_pos = Position::new(42.211, -8.443);
+    // schotland :  56.328 -4.577
+
+    // portugal 42.211, -8.443
+    let start_pos = Position::new(56.328, -4.577);
+
     let gr_l = "3a7bd5".to_string();
     let gr_r = "3a6073".to_string();
 
@@ -73,7 +91,7 @@ fn GpxMapTrackViewer(gpx_data: GpxData) -> impl IntoView {
     // log!("Rendering view");
 
     view! {
-        <MapContainer style="height: 90vh; width: 100vw;" center=start_pos zoom=8.0 set_view=true>
+        <MapContainer style="height: 90vh; width: 100vw;" center=start_pos zoom=9.0 set_view=true>
             <TileLayer url=map_url attribution="&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"/>
             <TrackCollection tracks=gpx_data.clone().underlays gradient_left="abb5d6".to_string() gradient_right="abb5d6".to_string() />
             <TrackCollection tracks=gpx_data.clone().tracks gradient_left=gr_l gradient_right=gr_r />
@@ -203,14 +221,14 @@ pub async fn get_gpx_tracks(resolution: i32, sub_path: &str) -> Result<Vec<Track
 }
 
 #[server]
-pub async fn get_all_gpx_data(resolution: i32) -> Result<GpxData, ServerFnError> {
+pub async fn get_all_gpx_data(resolution: i32, underlay_resolution: i32) -> Result<GpxData, ServerFnError> {
     let gpx_tracks = get_gpx_tracks(resolution, "./uploads").await;
     let tracks = match gpx_tracks {
         Ok(tracks_list) => tracks_list,
         Err(_) => vec![],
     };
 
-    let underlay_tracks = get_gpx_tracks(resolution, "./underlays").await;
+    let underlay_tracks = get_gpx_tracks(underlay_resolution, "./underlays").await;
     let underlays = match underlay_tracks {
         Ok(underlays_list) => underlays_list,
         Err(_) => vec![],
