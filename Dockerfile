@@ -9,7 +9,7 @@ RUN npm install -g sass
 
 RUN apk add --no-cache bash curl npm libc-dev binaryen perl
 
-RUN cargo install cargo-leptos --version 0.2.32 --force
+RUN cargo install cargo-leptos --version 0.3.6 --force
 RUN cargo install wasm-bindgen-cli --version 0.2.101 --force
 
 # RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/leptos-rs/cargo-leptos/releases/latest/download/cargo-leptos-installer.sh | sh
