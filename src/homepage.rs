@@ -37,7 +37,7 @@ pub fn Banner() -> impl IntoView {
             <div class="navbar-container">
                 <a class="navbar-brand" href="#">
                     <img src="scotland_logo.jpg" alt="Logo" class="logo" />
-                    <span class="site-title">WEST HIGHLAND WAY 2025</span>
+                    <span class="site-title">FISHERMAN'S TRAIL 2026</span>
                 </a>
             </div>
         </nav>
