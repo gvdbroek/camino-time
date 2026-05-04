@@ -23,6 +23,12 @@ The intention is to use this app as a way for friends & families to track our ca
 
 ## Running the project
 
+### Force specific leptops builds
+```bash
+cargo install -f wasm-bindgen-cli --version 0.2.101
+cargo install cargo-leptos --force
+```
+
 Interatively with hot reload:
 ```bash
 cargo leptos watch
