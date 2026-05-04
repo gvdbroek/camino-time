@@ -7,7 +7,9 @@ RUN apk update && \
 
 RUN npm install -g sass
 
-RUN apk add --no-cache bash curl npm libc-dev binaryen perl  make
+# RUN apk add --no-cache bash curl npm libc-dev binaryen perl  make
+RUN apk add --no-cache bash curl npm libc-dev binaryen openssl-dev
+ENV OPENSSL_NO_VENDOR=1
 
 RUN cargo install cargo-leptos --version 0.3.6 --force
 RUN cargo install wasm-bindgen-cli --version 0.2.101 --force
