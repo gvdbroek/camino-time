@@ -1,8 +1,8 @@
 name: Docker Image CI
 on:
   workflow_dispatch:
-    
-  
+
+
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   USERNAME: ${{ github.actor }}
@@ -11,34 +11,72 @@ env:
   IMAGE_NAME: camino-time
   TAG: $(date +%s)
 
-  
 jobs:
   build_container:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
-          ref: ${{ github.head_ref }}   # checkout the correct branch name
-          fetch-depth: 0                # fetch the whole repo history
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
 
       - name: Git Version
         id: version
         uses: codacy/git-version@2.7.1
-      
-      - name: Use the version
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2025-09-01
+          targets: wasm32-unknown-unknown
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install cargo-leptos
         run: |
-          echo ${{ steps.version.outputs.version }}
-      - name: Use the previous version
-        run: |
-          echo ${{ steps.version.outputs.previous-version }}
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag ghcr.io/${{ github.actor }}/camino-time:latest --tag ghcr.io/${{ github.actor }}/camino-time:${{ steps.version.outputs.version }}
-        
-      - name: ghcr login
-        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login $REGISTRY -u $USERNAME --password-stdin
-      - name: ghrc push latest
-        run: docker push ghcr.io/${{ github.actor }}/camino-time:latest
-      - name: ghrc push versioned
-        run: docker push ghcr.io/${{ github.actor }}/camino-time:${{ steps.version.outputs.version }}
-        
+          wget -q https://github.com/leptos-rs/cargo-leptos/releases/download/v0.3.6/cargo-leptos-x86_64-unknown-linux-musl.tar.gz
+          tar -xzf cargo-leptos-x86_64-unknown-linux-musl.tar.gz
+          mv cargo-leptos ~/.cargo/bin/
+
+      - name: Install wasm-bindgen-cli
+        run: cargo install wasm-bindgen-cli --version 0.2.101 --force
+
+      - name: Build
+        run: cargo leptos build --release
+
+      - name: Build Docker image
+        run: docker build . --file Dockerfile ...
+
+#
+#
+# jobs:
+#   build_container:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v3
+#         with:
+#           ref: ${{ github.head_ref }}   # checkout the correct branch name
+#           fetch-depth: 0                # fetch the whole repo history
+#
+#       - name: Git Version
+#         id: version
+#         uses: codacy/git-version@2.7.1
+#
+#       - name: Use the version
+#         run: |
+#           echo ${{ steps.version.outputs.version }}
+#       - name: Use the previous version
+#         run: |
+#           echo ${{ steps.version.outputs.previous-version }}
+#       - name: Build the Docker image
+#         run: docker build . --file Dockerfile --tag ghcr.io/${{ github.actor }}/camino-time:latest --tag ghcr.io/${{ github.actor }}/camino-time:${{ steps.version.outputs.version }}
+#
+#       - name: ghcr login
+#         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login $REGISTRY -u $USERNAME --password-stdin
+#       - name: ghrc push latest
+#         run: docker push ghcr.io/${{ github.actor }}/camino-time:latest
+#       - name: ghrc push versioned
+#         run: docker push ghcr.io/${{ github.actor }}/camino-time:${{ steps.version.outputs.version }}
+#

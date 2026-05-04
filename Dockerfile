@@ -24,21 +24,34 @@ COPY . .
 
 RUN cargo leptos build --release -vv
 
-FROM rustlang/rust:nightly-alpine as runner
+# FROM rustlang/rust:nightly-alpine as runner
+#
+# WORKDIR /app
+#
+# COPY --from=builder /work/target/release/camino-time /app/
+# COPY --from=builder /work/target/site /app/site
+# COPY --from=builder /work/Cargo.toml /app/
+#
+# ENV RUST_LOG="info"
+# ENV LEPTOS_SITE_ADDR="0.0.0.0:8080"
+# ENV LEPTOS_SITE_ROOT=./site
+# EXPOSE 8080
+#
+# # RUN mkdir -p /app/camino-time/uploads
+# RUN install -d /app/uploads
+# RUN install -d /app/underlays
+#
+# CMD ["/app/camino-time"]
 
+FROM alpine AS runner
 WORKDIR /app
-
-COPY --from=builder /work/target/release/camino-time /app/
-COPY --from=builder /work/target/site /app/site
-COPY --from=builder /work/Cargo.toml /app/
-
+COPY target/release/camino-time /app/
+COPY target/site /app/site
+COPY Cargo.toml /app/
 ENV RUST_LOG="info"
 ENV LEPTOS_SITE_ADDR="0.0.0.0:8080"
 ENV LEPTOS_SITE_ROOT=./site
 EXPOSE 8080
-
-# RUN mkdir -p /app/camino-time/uploads
 RUN install -d /app/uploads
 RUN install -d /app/underlays
-
 CMD ["/app/camino-time"]
