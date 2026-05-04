@@ -1,13 +1,16 @@
 
 # Get started with a build env with Rust nightly
-FROM rustlang/rust:nightly-alpine AS builder
+FROM rustlang/rust:nightly-2025-09-01-alpine AS builder
 
 RUN apk update && \
     apk add --no-cache bash curl npm libc-dev binaryen
 
 RUN npm install -g sass
 
-RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/leptos-rs/cargo-leptos/releases/latest/download/cargo-leptos-installer.sh | sh
+RUN cargo install cargo-leptos --force
+RUN cargo install wasm-bindgen-cli --version 0.2.101 --force
+
+# RUN curl --proto '=https' --tlsv1.2 -LsSf https://github.com/leptos-rs/cargo-leptos/releases/latest/download/cargo-leptos-installer.sh | sh
 
 # Add the WASM target
 RUN rustup target add wasm32-unknown-unknown
